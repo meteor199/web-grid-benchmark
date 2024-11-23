@@ -1,0 +1,16 @@
+{
+  "name": "@web-grid-benchmark/core",
+  "version": "0.1.0",
+  "main": "./src/index.ts",
+  "scripts": {
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@faker-js/faker": "^9.2.0",
+    "performance-now": "^2.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.5"
+  }
+}

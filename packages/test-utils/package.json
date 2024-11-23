@@ -1,0 +1,24 @@
+{
+  "name": "@web-grid-benchmark/test-utils",
+  "version": "0.1.0",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "ts-node src/dev.ts",
+    "bench": "ts-node src/index.ts",
+    "test": "playwright test"
+  },
+  "dependencies": {
+    "@web-grid-benchmark/core": "workspace:*",
+    "express": "^4.21.1",
+    "playwright": "^1.49.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.5"
+  }
+}

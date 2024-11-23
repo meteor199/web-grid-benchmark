@@ -1,0 +1,21 @@
+{
+  "name": "@web-grid-benchmark/docs",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "deploy": "gh-pages -d dist"
+  },
+  "dependencies": {
+    "@web-grid-benchmark/core": "workspace:*",
+    "@web-grid-benchmark/test-utils": "workspace:*",
+    "ag-grid-community": "^32.3.3"
+  },
+  "devDependencies": {
+    "gh-pages": "^6.2.0",
+    "typescript": "^5.5.3",
+    "vite": "^5.4.2"
+  }
+}
