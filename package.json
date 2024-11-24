@@ -4,14 +4,27 @@
   "version": "1.0.0",
   "scripts": {
     "build": "pnpm -r run build",
-    "bench": "pnpm -r run bench"
+    "bench": "pnpm -r run bench",
+    "prepare": "husky install",
+    "commit": "git add . && git-cz"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.6.0",
+    "@commitlint/config-conventional": "^19.6.0",
+    "conventional-changelog-cli": "^5.0.0",
+    "cz-customizable": "^7.2.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.10",
     "@typescript-eslint/eslint-plugin": "^8.15.0",
     "@typescript-eslint/parser": "^8.15.0",
     "eslint": "^9.15.0",
     "eslint-config-prettier": "^9.1.0",
     "prettier": "^3.3.3",
-    "typescript": "^5.6.3"
+    "typescript": "^5.7.2"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-customizable"
+    }
   }
 }
