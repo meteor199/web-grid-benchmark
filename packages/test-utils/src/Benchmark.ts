@@ -1,4 +1,6 @@
 import { chromium, Page } from 'playwright';
+import { BenchRenderData } from './benchmarks';
+import { wait } from '@web-grid-benchmark/core';
 
 interface BenchmarkResult {
   step: string;
@@ -24,21 +26,59 @@ export class Benchmark {
 
     try {
       console.log('Launching browser and navigating to the page...');
+
+      let client = await page.context().newCDPSession(page);
       await page.goto(this.url);
+      console.log('initBenchmark Playwright');
+      let categories = [
+        'blink.user_timing',
+        'devtools.timeline',
+        'disabled-by-default-devtools.timeline',
+      ];
 
-      await page.waitForFunction(() => (window as any).setData === 1);
+      const benchRenderData = new BenchRenderData();
+      await benchRenderData.init(page);
 
-      this.results.memoryUsed = await this.getMemoryUsage(page);
-      // Execute benchmark steps
-      // this.results.openPage = await this.recordMetrics(page, 'openPage');
-      // this.results.showGrid = await this.recordMetrics(page, 'showGrid');
-      //   this.results.setData = await this.recordMetrics(page, 'setData');
-      // this.results.scroll = await this.recordMetrics(page, 'scroll');
-      // this.results.sort = await this.recordMetrics(page, 'sort');
-      // this.results.filter = await this.recordMetrics(page, 'filter');
+      // await forceGC(page);
 
-      console.log('Benchmark completed:');
-      console.log(this.results);
+      // const tracePath = fileNameTrace(framework, benchmark.benchmarkInfo, i, benchmarkOptions)
+
+      // await browser.startTracing(page, {
+      //   path: tracePath,
+      //   screenshots: false,
+      //   categories: categories,
+      // });
+      await wait(1000);
+      const start = performance.now();
+      await benchRenderData.run(page);
+      const duration = performance.now() - start;
+      console.log(`Render data took ${duration} ms`);
+
+      await wait(2000);
+      // await browser.stopTracing();
+      // let result = await computeResultsCPU(tracePath);
+      // let resultScript = await computeResultsJS(
+      //   result,
+      //   config,
+      //   tracePath
+      // );
+      // let resultPaint = await computeResultsPaint(
+      //   result,
+      //   config,
+      //   tracePath
+      // );
+
+      // let res = { total: result.duration, script: resultScript, paint: resultPaint };
+      // results.push(res);
+      // console.log(`duration for ${framework.name} and ${benchmark.benchmarkInfo.id}: ${JSON.stringify(res)}`);
+      // if (result.duration < 0) throw new Error(`duration ${result} < 0`);
+      // try {
+      //   if (page) {
+      //     await page.close();
+      //   }
+      // } catch (error) {
+      //   console.log("ERROR closing page", error);
+      // }
     } catch (error) {
       console.error('Benchmark encountered an error:', error);
     } finally {
@@ -102,4 +142,10 @@ export class Benchmark {
       });
     });
   }
+}
+
+async function forceGC(page: Page) {
+  await page.evaluate(
+    "window.gc({type:'major',execution:'sync',flavor:'last-resort'})"
+  );
 }
