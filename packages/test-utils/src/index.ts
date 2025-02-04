@@ -16,7 +16,7 @@ const benchOptions: BenchmarkOptions = {
 async function runAllBenchmarks(port: number) {
   const subdirectories = await getSubdirectories(GRID_DIST_DIR);
 
-  const iterationCount = 3;
+  const iterationCount = 1;
   benchOptions.url = `http://localhost:${port}/`;
 
   for (let i = 0; i < iterationCount; i++) {

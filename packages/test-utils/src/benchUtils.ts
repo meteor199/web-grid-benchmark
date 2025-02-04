@@ -31,10 +31,12 @@ export async function appendResult(result: Object) {
 export async function getMemoryUsage(page: Page, client: CDPSession) {
   await forceGC(page);
   await wait(40);
-  // let result = (await client.send('Performance.getMetrics'))
-  //   .metrics.find((m) => m.name === 'JSHeapUsedSize')!.value / 1024 / 1024;
-  let result = ((await page.evaluate("performance.measureUserAgentSpecificMemory()")) as any)
-    .bytes / 1024 / 1024;
+  let result = (await client.send('Performance.getMetrics'))
+    .metrics.find((m) => m.name === 'JSHeapUsedSize')!.value / 1024 / 1024;
+  
+  // let result = ((await page.evaluate("performance.measureUserAgentSpecificMemory()")) as any)
+  //   .bytes / 1024 / 1024;
+  
   return Number(result.toFixed(2));
 }
 

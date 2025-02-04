@@ -76,4 +76,7 @@ export class VxeBenchmarkHelper extends BaseBenchmarkHelper {
       });
     });
   }
+  protected async insertData(data: EmployeeModel[]) {
+    gridData.value.unshift(...data);
+  }
 }

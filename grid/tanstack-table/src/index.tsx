@@ -273,4 +273,12 @@ class BenchmarkHelper extends BaseBenchmarkHelper {
       );
     });
   }
+
+  protected async insertData(data: EmployeeModel[]) {
+    root.render(
+      <React.StrictMode>
+        <DataTable data={[...data, ...gridData]} />
+      </React.StrictMode>
+    );
+  }
 }

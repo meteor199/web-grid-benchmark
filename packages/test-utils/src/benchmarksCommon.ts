@@ -39,6 +39,7 @@ export enum Benchmark {
   _03 = '03_sort',
   _04 = '04_filter',
   _05 = '05_push',
+  _06 = '06_all_data_push',
 
 }
 

@@ -245,21 +245,26 @@ export function generateGridDataUseFaker(index: number): EmployeeModel {
 }
 
 export function startWs(
-  query: { count?: number; interval?: number; total?: number } | undefined,
-  callback: (data: EmployeeModel[]) => void
+  query: { count?: number; interval?: number; isPushAllData?: boolean; total?: number } | undefined,
+  callback: (data: EmployeeModel[]) => void,
+  endCallback?: () => void,
 ) {
   const options = Object.assign(
-    { count: 10, interval: 500, total: 100000 },
+    { count: 10, interval: 500, isPushAllData: false, total: 100000 },
     query || {}
   );
 
-  //  WebSocket ，
   const ws = new WebSocket(
-    `ws://${getBaseUrl()}?count=${options.count}&interval=${options.interval}&total=${options.total}`
+    `ws://${getBaseUrl()}?count=${options.count}&interval=${options.interval}&total=${options.total}&isPushAllData=${options.isPushAllData ? '1' : '0'}`
   );
 
   // 
   ws.addEventListener('message', (event) => {
+    if (event.data === 'null') {
+      endCallback?.();
+      return;
+    }
+    
     const data = JSON.parse(event.data);
     callback(data);
   });

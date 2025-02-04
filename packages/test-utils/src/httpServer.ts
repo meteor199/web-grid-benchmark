@@ -1,10 +1,12 @@
 import express from 'express';
 import { createServer, Server } from 'http';
 import { GRID_DIST_DIR } from './constants';
-import { Server as WsServer, WebSocket } from 'ws';
+import { WebSocket, WebSocketServer } from 'ws';
 import url from 'url';
 import { generateGridDataUseFaker } from '@web-grid-benchmark/core';
 import { faker } from '@faker-js/faker';
+import path from 'path';
+import fs from 'fs';
 
 let server: Server;
 let app: express.Application;
@@ -53,23 +55,34 @@ export function stopServer() {
 }
 
 function setWs() {
-  const wss = new WsServer({ server: server });
+  const wss = new WebSocketServer({ server: server });
   wss.on('connection', (ws, req) => {
     const query = url.parse(req.url!, true).query as {
       count: string;
       interval: string;
+      isPushAllData: string;
       total: string;
     };
     const count = parseInt(query.count) || 1;
     const interval = parseInt(query.interval) || 100;
     const total = parseInt(query.total) || 100000;
+    const isPushAllData = query.isPushAllData === '1' || false;
+    console.log('ws connect', count, interval, total, isPushAllData);
+    if (isPushAllData) {
+      pushAllData(ws, { count, interval, total });
+    } else {
 
-    console.log('ws connect', count, interval, total);
-
-    pushData(ws, { count, interval, total });
+      pushData(ws, { count, interval, total });
+    }
   });
 }
 
+/**
+ * push data to the client
+ * 每隔interval时间推送count条数据，数据是随机生成的。
+ * @param ws 
+ * @param options 
+ */
 function pushData(
   ws: WebSocket,
   options: { count: number; interval: number; total: number }
@@ -84,4 +97,33 @@ function pushData(
     ws.send(JSON.stringify(dataList));
   }, options.interval);
   ws.on('close', () => clearInterval(timer));
+}
+
+function pushAllData(
+  ws: WebSocket,
+  options: { count: number; interval: number; total: number }
+) {
+  const testDataPath = path.join(GRID_DIST_DIR, 'test-data.json');
+  let data = JSON.parse(fs.readFileSync(testDataPath, 'utf-8'));
+  data = data.slice(0, options.total);
+  let currentIndex = data.length;
+
+  const timer = setInterval(() => {
+    if (currentIndex <= 0) {
+      clearInterval(timer);
+      ws.send('null');
+      return;
+    }
+
+    const startIndex = Math.max(0, currentIndex - options.count);
+    const chunk = data.slice(startIndex, currentIndex);
+    currentIndex = startIndex;
+
+    ws.send(JSON.stringify(chunk));
+  }, options.interval);
+
+  // Clean up on client disconnect
+  ws.on('close', () => {
+    clearInterval(timer);
+  });
 }

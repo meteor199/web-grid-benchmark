@@ -1,4 +1,4 @@
-import { stopWs } from './data';
+import { EmployeeModel, startWs, stopWs } from './data';
 import { FPS } from './FPS';
 
 export const WINDOW__BENCHMARK_HELPER = '__BENCHMARK_HELPER__';
@@ -13,7 +13,7 @@ export enum WaitForType {
 }
 
 export function registerBenchmarkHelper<
-  T extends { new (): BaseBenchmarkHelper },
+  T extends { new(): BaseBenchmarkHelper },
 >(target: T) {
   const instance = new (target as any)();
   (window as any)[WINDOW__BENCHMARK_HELPER] = instance;
@@ -26,6 +26,8 @@ export abstract class BaseBenchmarkHelper {
   public abstract filter(): Promise<WaitForInfo | void>;
   public abstract startWebsocket(): Promise<WaitForInfo | void>;
 
+  protected abstract insertData(data: EmployeeModel[]): Promise<WaitForInfo | void>;
+
   public async stopWebsocket() {
     stopWs();
   }
@@ -36,5 +38,20 @@ export abstract class BaseBenchmarkHelper {
     return {
       result: { fps: FPS.stop() },
     };
+  }
+
+  public async startAllDataPush() {
+
+    return await new Promise<void>((resolve) => {
+      startWs(
+        { count: 100, interval: 10, isPushAllData: true, total: 10000 },
+        (data) => {
+          this.insertData(data);
+        },
+        () => {
+          resolve();
+        }
+      );
+    });
   }
 }

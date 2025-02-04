@@ -15,7 +15,7 @@ import { loadData, quantile, calculateStats, processData } from './utils';
 // Initialize Grid after DOM content is loaded
 document.addEventListener('DOMContentLoaded', async () => {
   // Load data
-  const data = await loadData('./results_throttled.json');
+  const data = await loadData('./result.json');
   console.log(data);
   // // Create chart
   // const chartConfig = createChartConfig(data.metrics.duration, data.combinations);

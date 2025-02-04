@@ -38,6 +38,7 @@ class TestcaseComponent extends HTMLElement {
           <button id="helper_sort">sort</button>
           <button id="helper_filter">filter</button>
           <button id="helper_start_ws">start websocket</button>
+          <button id="helper_start_all_data_push">start all data push</button>
           <button id="helper_stop_ws">stop websocket</button>
 
         </div>
@@ -70,6 +71,10 @@ class TestcaseComponent extends HTMLElement {
     this.shadowRoot
       ?.querySelector('#helper_stop_ws')
       ?.addEventListener('click', () => this.getHelper()!.stopWebsocket());
+
+    this.shadowRoot
+      ?.querySelector('#helper_start_all_data_push')
+      ?.addEventListener('click', () => this.getHelper()!.startAllDataPush());
   }
 }
 

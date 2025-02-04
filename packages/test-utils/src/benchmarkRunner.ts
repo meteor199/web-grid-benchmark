@@ -5,6 +5,7 @@ import { BenchScroll } from './benchs/BenchScroll';
 import { BenchSort } from './benchs/BenchSort';
 import { BenchFilter } from './benchs/BenchFilter';
 import { BenchPush } from './benchs/BenchPush';
+import { BenchAllDataPush } from './benchs/BenchAllDataPush';
 
 export async function runBenchmark(
   gridData: GridData,
@@ -18,6 +19,7 @@ export async function runBenchmark(
     new BenchSort(),
     new BenchFilter(),
     new BenchPush(),
+    new BenchAllDataPush(),
   ];
   for (const task of tasks) {
     const benchmark = new Benchmark(task, gridData, benchOptions);

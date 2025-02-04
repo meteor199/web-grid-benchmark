@@ -45,7 +45,7 @@ const option: VTable.TYPES.ListTableConstructorOptions = {
         const barHeight = 16;
         const progressWidth = (barWidth * percentage) / 100;
 
-        const elements:ICustomRenderElement[] = [
+        const elements: ICustomRenderElement[] = [
           // 
           {
             type: 'rect',
@@ -100,7 +100,7 @@ const option: VTable.TYPES.ListTableConstructorOptions = {
         const iconSize = 20;
         const iconMargin = 10;
 
-        const elements:ICustomRenderElement[] = [
+        const elements: ICustomRenderElement[] = [
           // 
           {
             type: 'circle',
@@ -215,5 +215,11 @@ export class BenchmarkHelper extends BaseBenchmarkHelper {
       });
       tableInstance.setRecords(gridData);
     });
+  }
+
+
+  protected async insertData(data: EmployeeModel[]) {
+    gridData.unshift(...data);
+    tableInstance.setRecords(gridData);
   }
 }

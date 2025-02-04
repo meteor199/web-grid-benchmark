@@ -161,4 +161,12 @@ export class BenchmarkHelper extends BaseBenchmarkHelper {
       });
     });
   }
+
+  
+  protected async insertData(data: EmployeeModel[]) {
+    gridApi.applyTransaction({
+      add: data,
+      addIndex: 0,
+    });
+  }
 }

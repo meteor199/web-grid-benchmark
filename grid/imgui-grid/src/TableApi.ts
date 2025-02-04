@@ -264,6 +264,31 @@ export class TableApi {
     }
   }
 
+  insertData(data: EmployeeModel[]): void {
+    try {
+      console.time('insert_data');
+      const insertData = this.Module.cwrap('create_employee_data_array', 'number', ['number']);
+      const arrayPtr = insertData(data.length);
+      
+      // Get pointer array for new data
+      const ptrArray = new Int32Array(this.Module.HEAP32.buffer, arrayPtr, data.length);
+      
+      // Fill new data
+      for (let i = 0; i < data.length; i++) {
+        const structPtr = ptrArray[i];
+        this.prtCache.set(data[i].id, structPtr);
+        this.setDataItem(structPtr, data[i]);
+      }
+      console.timeEnd('insert_data');
+      
+      // Apply changes
+      this.setData();
+    } catch (error) {
+      console.error('Failed to insert data:', error);
+      throw error;
+    }
+  }
+
   updateData(data: EmployeeModel[]): void {
     for (const item of data) {
       this.setDataItem(this.prtCache.get(item.id)!, item);
