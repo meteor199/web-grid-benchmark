@@ -6,21 +6,24 @@
     "build": "pnpm -r run build",
     "bench": "pnpm -r run bench",
     "prepare": "husky install",
+    "prepare-env": "pnpm -r run prepare-env",
+    "server": "pnpm -r run server",
     "commit": "git add . && git-cz"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.6.0",
     "@commitlint/config-conventional": "^19.6.0",
-    "conventional-changelog-cli": "^5.0.0",
-    "cz-customizable": "^7.2.1",
-    "husky": "^9.1.7",
-    "lint-staged": "^15.2.10",
     "@typescript-eslint/eslint-plugin": "^8.15.0",
     "@typescript-eslint/parser": "^8.15.0",
+    "conventional-changelog-cli": "^5.0.0",
+    "cz-customizable": "^7.2.1",
     "eslint": "^9.15.0",
     "eslint-config-prettier": "^9.1.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.10",
     "prettier": "^3.3.3",
-    "typescript": "^5.7.2"
+    "typescript": "5.5.3",
+    "vitest": "^2.1.5"
   },
   "config": {
     "commitizen": {

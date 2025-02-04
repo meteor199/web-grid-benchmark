@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@web-grid-benchmark/core": "workspace:*",
-    "@web-grid-benchmark/test-utils": "workspace:*",
     "ag-grid-community": "^32.3.3"
   },
   "devDependencies": {

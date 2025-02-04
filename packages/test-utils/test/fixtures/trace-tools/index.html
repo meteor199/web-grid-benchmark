@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>200ms Loop Test</title>
+    <style>
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <button onclick="runLoop()">Start 200ms Loop</button>
+
+    <script>
+        function runLoop() {
+            
+            console.log('Loop started');
+            let startTime = performance.now();
+            while (performance.now() - startTime < 100) {
+                // Empty loop running for 200ms
+            }
+            runLoopChild();
+            runLoopChild();
+            runLoopChild();
+
+            startTime = performance.now();
+            while (performance.now() - startTime < 25) {
+                // Empty loop running for 200ms
+            }
+            console.log('Loop finished');
+        }
+
+        function runLoopChild() {
+            const startTime = performance.now();
+            while (performance.now() - startTime < 50) {
+                // Empty loop running for 200ms
+            }
+            console.log('runLoopChild finished');
+        }
+    </script>
+</body>
+
+</html>

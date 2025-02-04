@@ -5,6 +5,9 @@ export interface ColumnDefinition {
   width?: number;
   flex?: number;
   format?: string;
+  sortable?: boolean;
+  filterable?: boolean;
+  pinned?: boolean;
 }
 
 export interface GridData {

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+      th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      th {
+        background-color: #f4f4f4;
+        cursor: pointer;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+      }
+      th:hover {
+        background-color: #e4e4e4;
+      }
+      tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+      #grid-viewport {
+        height: 600px;
+        overflow: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <testcase-component></testcase-component>
+    <div id="grid-container" class="grid-container"></div>
+    <script type="module" src="./src/index.tsx"></script>
+  </body>
+</html>

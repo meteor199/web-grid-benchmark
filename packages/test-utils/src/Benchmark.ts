@@ -1,151 +1,152 @@
-import { chromium, Page } from 'playwright';
-import { BenchRenderData } from './benchmarks';
-import { wait } from '@web-grid-benchmark/core';
-
-interface BenchmarkResult {
-  step: string;
-  duration: number;
-  memoryUsed: number;
-  fps: number | null;
-  result: any;
-}
+import { CDPSession, chromium, Page } from 'playwright';
+import { CPUBenchmark } from './CPUBenchmark';
+import { GRID_CONFIG, wait } from '@web-grid-benchmark/core';
+import { BenchmarkOptions, GridData } from './benchmarksCommon';
+import { RESULT_FILE, TRACE_DIR, TRACE_THROTTLED_DIR } from './constants';
+import {
+  getMemoryUsage,
+  appendResult,
+  calcDuration
+} from './benchUtils';
+import fs from 'fs/promises';
 
 export class Benchmark {
-  private url: string;
-  private results = {
-    memoryUsed: 0,
-  };
-
-  constructor(url: string) {
-    this.url = url; // URL of the page to benchmark
+  constructor(
+    private task: CPUBenchmark,
+    private gridData: GridData,
+    private benchOptions: BenchmarkOptions
+  ) {
+    this.gridData = gridData; // URL of the page to benchmark
   }
 
-  async run(): Promise<Record<string, any>> {
-    const browser = await chromium.launch({ headless: false });
+  async run() {
+    const args = [
+      `--window-size=${GRID_CONFIG.gridWidth + 100},${GRID_CONFIG.gridHeight + 200}`,
+      '--js-flags=--expose-gc',
+      '--enable-benchmarking',
+    ];
+
+    if (this.benchOptions.disableGPU) {
+      args.push(...[
+        // '--disable-gpu',
+        // '--disable-gpu-compositing',
+        // '--disable-software-rasterizer',
+        // '--disable-gpu-rasterization',
+        // '--disable-native-gpu-memory-buffers',
+        // '--disable-accelerated-2d-canvas',
+        // '--disable-accelerated-video-decode',
+        // -----
+        '--use-gl=swiftshader',
+        '--use-angle=swiftshader',
+        // '--enable-webgl',
+        // '--ignore-gpu-blocklist'
+      ]);
+    }
+    const browser = await chromium.launch({
+      args: args,
+      headless: false
+    });
     const page = await browser.newPage();
 
     try {
       console.log('Launching browser and navigating to the page...');
 
       let client = await page.context().newCDPSession(page);
-      await page.goto(this.url);
-      console.log('initBenchmark Playwright');
-      let categories = [
-        'blink.user_timing',
-        'devtools.timeline',
-        'disabled-by-default-devtools.timeline',
-      ];
 
-      const benchRenderData = new BenchRenderData();
-      await benchRenderData.init(page);
+      // 设置 CPU 限速
+      if (this.benchOptions.cpuSlowdownFactor) {
+        await client.send('Emulation.setCPUThrottlingRate', {
+          rate: this.benchOptions.cpuSlowdownFactor
+        });
+      }
 
-      // await forceGC(page);
+      await page.goto(this.benchOptions.url + this.gridData.urlPrefix);
+      await client.send('Performance.enable');
 
-      // const tracePath = fileNameTrace(framework, benchmark.benchmarkInfo, i, benchmarkOptions)
+      await this.task.init(page);
 
-      // await browser.startTracing(page, {
-      //   path: tracePath,
-      //   screenshots: false,
-      //   categories: categories,
-      // });
-      await wait(1000);
-      const start = performance.now();
-      await benchRenderData.run(page);
-      const duration = performance.now() - start;
-      console.log(`Render data took ${duration} ms`);
+      console.log('init success');
 
-      await wait(2000);
-      // await browser.stopTracing();
-      // let result = await computeResultsCPU(tracePath);
-      // let resultScript = await computeResultsJS(
-      //   result,
-      //   config,
-      //   tracePath
-      // );
-      // let resultPaint = await computeResultsPaint(
-      //   result,
-      //   config,
-      //   tracePath
-      // );
+      const tracePath = this.getTracePath() + '.json';
 
-      // let res = { total: result.duration, script: resultScript, paint: resultPaint };
-      // results.push(res);
-      // console.log(`duration for ${framework.name} and ${benchmark.benchmarkInfo.id}: ${JSON.stringify(res)}`);
-      // if (result.duration < 0) throw new Error(`duration ${result} < 0`);
-      // try {
-      //   if (page) {
-      //     await page.close();
-      //   }
-      // } catch (error) {
-      //   console.log("ERROR closing page", error);
-      // }
+      const memoryStart = await getMemoryUsage(page, client);
+
+      await browser.startTracing(page, {
+        path: tracePath,
+        screenshots: false,
+        categories: [
+          'blink.user_timing',
+          'devtools.timeline',
+          'disabled-by-default-devtools.timeline',
+          'disabled-by-default-v8.cpu_profiler',
+          'disabled-by-default-v8.runtime_stats',
+          'v8.execute',
+          'v8',
+          'rendering',
+        ],
+      });
+
+      const startMetrics = await client.send('Performance.getMetrics')
+      const startTime = performance.now();
+      const runResult = (await this.task.run(page)) || {};
+      const duration = Math.floor(performance.now() - startTime);
+      const endMetrics = await client.send('Performance.getMetrics');
+
+      await browser.stopTracing();
+      const memoryEnd = await getMemoryUsage(page, client);
+
+      await this.saveMetics(startMetrics, endMetrics);
+
+      appendResult({
+        name: this.gridData.name,
+        benchId: this.task.benchmarkInfo.id,
+        iterationNumber: this.benchOptions.iterationNumber,
+        duration,
+        memoryStart,
+        memoryEnd,
+        ...calcDuration(startMetrics, endMetrics),
+        ...runResult,
+      });
+
+      await this.task.afterRun(page, this.gridData, this.benchOptions);
+
+
     } catch (error) {
       console.error('Benchmark encountered an error:', error);
+      throw error;
     } finally {
-      await browser.close();
-      console.log('Browser has been closed.');
-    }
-
-    return this.results;
-  }
-
-  private async recordMetrics(
-    page: Page,
-    stepName: string
-  ): Promise<BenchmarkResult> {
-    console.log(`Executing step: ${stepName}...`);
-    const startMemory = await this.getMemoryUsage(page);
-    const startTime = performance.now();
-
-    // Trigger the corresponding method on the page
-    const result = await page.evaluate(async (step: string) => {
-      if (window[step as keyof typeof window]) {
-        return await (window[step as keyof typeof window] as any)();
+      if (this.benchOptions.keepWindowOpen) {
+        console.log('Keeping browser window open. Close it manually to continue.');
+        try {
+          await new Promise<void>((resolve) => {
+            const cleanup = () => {
+              console.log('Browser window closed.');
+              resolve();
+            };
+            browser.on('disconnected', cleanup);
+          });
+        } catch (error) {
+          console.error('Error while waiting for browser to close:', error);
+        }
+      } else {
+        await browser.close();
+        console.log('Browser window closed.');
       }
-      throw new Error(`Method not defined on the page: ${step}`);
-    }, stepName);
-
-    const endTime = performance.now();
-    const endMemory = await this.getMemoryUsage(page);
-
-    // FPS is only calculated for the scroll step
-    const fps = stepName === 'scroll' ? await this.calculateFPS(page) : null;
-
-    return {
-      step: stepName,
-      duration: endTime - startTime,
-      memoryUsed: endMemory - startMemory,
-      fps,
-      result,
-    };
+    }
   }
 
-  private async getMemoryUsage(page: Page): Promise<number> {
-    const memory = await page.evaluate(
-      () => (performance as any).memory?.usedJSHeapSize || 0
-    );
-    console.log(`Current memory usage: ${memory} bytes`);
-    return memory;
+  private async saveMetics(startMetrics: any, endMetrics: any) {
+    const startMetricPath = this.getTracePath() + '_start.json';
+    const endMetricPath = this.getTracePath() + '_end.json';
+
+    const startMetricsJson = JSON.stringify(startMetrics, null, 2);
+    const endMetricsJson = JSON.stringify(endMetrics, null, 2);
+    await fs.writeFile(startMetricPath, startMetricsJson);
+    await fs.writeFile(endMetricPath, endMetricsJson);
   }
 
-  private async calculateFPS(page: Page): Promise<number> {
-    return await page.evaluate(() => {
-      let frames = 0;
-      const start = performance.now();
-      const interval = setInterval(() => frames++, 16); // Simulate frame counting
-      return new Promise<number>((resolve) => {
-        setTimeout(() => {
-          clearInterval(interval);
-          const duration = performance.now() - start;
-          resolve((frames / duration) * 1000); // FPS = frames per second
-        }, 1000); // Measure for 1 second
-      });
-    });
+  private getTracePath() {
+    return `${this.benchOptions.disableGPU ? TRACE_THROTTLED_DIR : TRACE_DIR
+      }/${this.gridData.name}_${this.task.benchmarkInfo.id}_${this.benchOptions.iterationNumber}`;
   }
-}
-
-async function forceGC(page: Page) {
-  await page.evaluate(
-    "window.gc({type:'major',execution:'sync',flavor:'last-resort'})"
-  );
 }

@@ -1,5 +1,21 @@
 import { runBenchmark } from './benchmarkRunner';
+import { BenchmarkOptions } from './benchmarksCommon';
 
 (async () => {
-  await runBenchmark(`http://localhost:5173/`);
+
+  const benchOptions: BenchmarkOptions = {
+    url: `http://localhost:5173/`,
+    iterationNumber: 1,
+    disableGPU: true,
+    cpuSlowdownFactor: 4,
+    // keepWindowOpen: true,
+  };
+
+  await runBenchmark(
+    {
+      name: 'test',
+      urlPrefix: '',
+    },
+    benchOptions
+  );
 })();

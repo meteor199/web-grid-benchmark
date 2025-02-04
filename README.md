@@ -25,13 +25,26 @@ All benchmarks are conducted under the following conditions:
 Want to verify our results? Clone and run the benchmarks locally:
 
 ```bash
+# prepare the environment
 git clone https://github.com/meteor199/web-grid-benchmark
 cd web-grid-benchmark
 pnpm i
-pnpx playwright install
+pnpm run prepare-env
+
+# run the benchmark
 pnpm run build
 pnpm run bench
 ```
+
+
+## Roadmap
+
+- 📊 Interactive performance comparison charts
+- 更准确的测试结果
+- 更多的表格支持
+- 完善更多的测试场景
+- 🔄 Weekly automated benchmark updates
+- 📈 Performance trend analysis
 
 ## Contributing
 
