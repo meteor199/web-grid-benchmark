@@ -14,11 +14,11 @@ export async function runBenchmark(
   // Launch the browser
 
   const tasks = [
-    new BenchRenderData(),
-    new BenchScroll(),
-    new BenchSort(),
-    new BenchFilter(),
-    new BenchPush(),
+    // new BenchRenderData(),
+    // new BenchScroll(),
+    // new BenchSort(),
+    // new BenchFilter(),
+    // new BenchPush(),
     new BenchAllDataPush(),
   ];
   for (const task of tasks) {

@@ -98,6 +98,7 @@ const gridOptions: GridOptions = {
   columnDefs: columnDefs,
   rowHeight: GRID_CONFIG.rowHeight,
   rowData: [],
+  animateRows: false,
   getRowId: (item) => {
     return item.data.id;
   },

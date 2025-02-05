@@ -267,8 +267,8 @@ export class TableApi {
   insertData(data: EmployeeModel[]): void {
     try {
       console.time('insert_data');
-      const insertData = this.Module.cwrap('create_employee_data_array', 'number', ['number']);
-      const arrayPtr = insertData(data.length);
+      const insertDataFn = this.Module.cwrap('insertData', 'number', ['number']);
+      const arrayPtr = insertDataFn(data.length);
       
       // Get pointer array for new data
       const ptrArray = new Int32Array(this.Module.HEAP32.buffer, arrayPtr, data.length);

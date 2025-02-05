@@ -229,6 +229,24 @@ const char *get_employee_data_layout() {
 }
 
 EMSCRIPTEN_KEEPALIVE
+EmployeeData **insertData(int count) {
+    auto oldSize = gb_temp_data_array.size();
+    gb_temp_data_array.resize(oldSize + count);
+    
+    // Move existing elements to make space at the beginning
+    for (int i = oldSize - 1; i >= 0; i--) {
+        gb_temp_data_array[i + count] = gb_temp_data_array[i];
+    }
+    
+    // Insert new empty elements at the beginning
+    for (int i = 0; i < count; i++) {
+        gb_temp_data_array[i] = new EmployeeData();
+    }
+    
+    return gb_temp_data_array.Data;
+}
+
+EMSCRIPTEN_KEEPALIVE
 void sort_data(const char *column, bool ascending) {
   TableRenderer::getInstance().sort(column, ascending);
 }
