@@ -8,7 +8,7 @@ import { BenchmarkOptions } from './benchmarksCommon';
     iterationNumber: 1,
     disableGPU: true,
     cpuSlowdownFactor: 4,
-    // keepWindowOpen: true,
+    keepWindowOpen: true,
   };
 
   await runBenchmark(

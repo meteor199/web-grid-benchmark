@@ -53,6 +53,7 @@ export abstract class BaseBenchmarkHelper {
     total: number;
   }) {
 
+    let totalRows = 0;
     return await new Promise<void>((resolve) => {
       options = options || { count: 100, interval: 10, total: 10000 };
       startWs(
@@ -64,6 +65,9 @@ export abstract class BaseBenchmarkHelper {
         },
         (data) => {
           this.insertData(data);
+
+          totalRows += data.length;
+          emitter.emit('data-count', totalRows);
         },
         async () => {
           await wait(1);

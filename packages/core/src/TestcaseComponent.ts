@@ -21,6 +21,13 @@ class TestcaseComponent extends HTMLElement {
         titleElement.textContent = title as string;
       }
     });
+
+    emitter.on('data-count', (count) => {
+      const countElement = this.shadowRoot!.querySelector('#count');
+      if (countElement) {
+        countElement.textContent = `Rows: ${count}`;
+      }
+    });
   }
 
   private getHelper() {
@@ -43,9 +50,21 @@ class TestcaseComponent extends HTMLElement {
             margin: 10px;
             font-weight: bold;
           }
+          .info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+          }
+          .count {
+            color: #666;
+            font-size: 14px;
+          }
         </style>
         <div>
-          <div id="title" class="title"></div>
+          <div class="info">
+            <div id="title" class="title"></div>
+            <div id="count" class="count"></div>
+          </div>
           <button id="helper_init">Init</button>
           <button id="helper_renderData">renderData</button>          
           <button id="helper_scroll">scroll</button>
