@@ -1,8 +1,10 @@
 import { wait } from '.';
 import { EmployeeModel, startWs, stopWs } from './data';
 import { FPS } from './FPS';
+import mitt from 'mitt';
 
 export const WINDOW__BENCHMARK_HELPER = '__BENCHMARK_HELPER__';
+export const emitter = mitt();
 
 export interface WaitForInfo {
   type?: WaitForType;
@@ -20,6 +22,10 @@ export function registerBenchmarkHelper<
   (window as any)[WINDOW__BENCHMARK_HELPER] = instance;
 }
 export abstract class BaseBenchmarkHelper {
+  public setTitle(title: string) {
+    emitter.emit('benchmark-title', title);
+  }
+
   public abstract init(): Promise<WaitForInfo | void>;
   public abstract renderData(): Promise<WaitForInfo | void>;
   public abstract scroll(): Promise<WaitForInfo | void>;

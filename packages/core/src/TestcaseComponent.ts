@@ -1,6 +1,7 @@
 import {
   BaseBenchmarkHelper,
   WINDOW__BENCHMARK_HELPER,
+  emitter,
 } from './BaseBenchmarkHelper';
 
 class TestcaseComponent extends HTMLElement {
@@ -13,6 +14,13 @@ class TestcaseComponent extends HTMLElement {
   connectedCallback() {
     this.render();
     this.addEventListeners();
+
+    emitter.on('benchmark-title', (title) => {
+      const titleElement = this.shadowRoot!.querySelector('#title');
+      if (titleElement) {
+        titleElement.textContent = title as string;
+      }
+    });
   }
 
   private getHelper() {
@@ -30,8 +38,14 @@ class TestcaseComponent extends HTMLElement {
             padding: 10px;
             cursor: pointer;
           }
+          .title {
+            font-size: 16px;
+            margin: 10px;
+            font-weight: bold;
+          }
         </style>
         <div>
+          <div id="title" class="title"></div>
           <button id="helper_init">Init</button>
           <button id="helper_renderData">renderData</button>          
           <button id="helper_scroll">scroll</button>

@@ -63,6 +63,7 @@ export class Benchmark {
       await page.goto(this.benchOptions.url + this.gridData.urlPrefix);
       await client.send('Performance.enable');
 
+      await this.task.setTitle(page);
       await this.task.init(page);
 
       console.log('init success');

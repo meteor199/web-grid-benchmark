@@ -28,7 +28,9 @@ export abstract class CPUBenchmark implements BenchmarkImpl {
   ) {
     //
   }
-
+  public setTitle(page: Page) {
+    this.evaluateWebHelper(page, 'setTitle', this.benchmarkInfo.id);
+  }
   public async evaluateWebHelper(
     page: Page,
     methodName: keyof BaseBenchmarkHelper,
