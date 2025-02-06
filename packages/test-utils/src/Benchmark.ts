@@ -63,14 +63,14 @@ export class Benchmark {
       await page.goto(this.benchOptions.url + this.gridData.urlPrefix);
       await client.send('Performance.enable');
 
-      await this.task.setTitle(page);
+      await this.task.setTitle(page, this.gridData.name + ' - ' + this.task.benchmarkInfo.id);
       await this.task.init(page);
 
       console.log('init success');
 
 
       const memoryStart = await getMemoryUsage(page, client);
-      
+
       // Only record trace logs if enabled in options
       if (this.benchOptions.enableTraceLog) {
         const tracePath = this.getTracePath() + '.json';
