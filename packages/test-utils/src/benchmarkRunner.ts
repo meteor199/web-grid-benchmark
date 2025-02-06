@@ -19,7 +19,13 @@ export async function runBenchmark(
     // new BenchSort(),
     // new BenchFilter(),
     // new BenchPush(),
-    new BenchAllDataPush(),
+
+    // 总1万条数据，每100ms推送5条数据
+    new BenchAllDataPush({ count: 1, interval: 1, total: 10000 }),
+    new BenchAllDataPush({ count: 1, interval: 10, total: 10000 }),
+    new BenchAllDataPush({ count: 10, interval: 10, total: 10000 }),
+    new BenchAllDataPush({ count: 100, interval: 10, total: 10000 }),
+    new BenchAllDataPush({ count: 100, interval: 100, total: 10000 }),
   ];
   for (const task of tasks) {
     const benchmark = new Benchmark(task, gridData, benchOptions);

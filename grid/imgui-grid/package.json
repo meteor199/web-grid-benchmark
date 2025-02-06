@@ -4,7 +4,7 @@
   "type": "module",
   "version": "0.1.0",
   "scripts": {
-    "init-env": "cd scripts && init-env.bat",
+    "prepare-env": "cd scripts && init-env.bat && npm run build-wasm",
     "build-wasm": "cd scripts && build-wasm.bat",
     "dev": "vite",
     "build": "vite build",

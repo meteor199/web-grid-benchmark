@@ -1,12 +1,15 @@
 import { Page } from 'playwright';
 import { CPUBenchmark } from '../CPUBenchmark';
 import { Benchmark } from '../benchmarksCommon';
-import { wait } from '@web-grid-benchmark/core';
 
 export class BenchAllDataPush extends CPUBenchmark {
-  constructor() {
+  constructor(private options: {
+    count: number;
+    interval: number;
+    total: number;
+  }) {
     super({
-      id: Benchmark._06,
+      id: Benchmark._06 +`${options.count}-${options.interval}-${options.total}`,
       label: '06_all_data_push',
       description: 'websocket push all data, 10 nums per ms',
     });
@@ -16,7 +19,7 @@ export class BenchAllDataPush extends CPUBenchmark {
   }
   async run(page: Page) {
     await this.evaluateWebHelper(page, 'fpsStart');
-    await this.evaluateWebHelper(page, 'startAllDataPush');
+    await this.evaluateWebHelper(page, 'startAllDataPush', this.options);
     const { result } = await this.evaluateWebHelper(page, 'fpsStop');
     await this.evaluateWebHelper(page, 'stopWebsocket');
     return result;

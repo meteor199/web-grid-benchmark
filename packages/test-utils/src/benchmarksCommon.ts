@@ -8,7 +8,7 @@ export enum BenchmarkType {
 }
 
 export interface BenchmarkInfoBase {
-  id: Benchmark;
+  id: string;
   label: string;
   description: string;
   type?: BenchmarkType;

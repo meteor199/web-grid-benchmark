@@ -1,3 +1,4 @@
+import { wait } from '.';
 import { EmployeeModel, startWs, stopWs } from './data';
 import { FPS } from './FPS';
 
@@ -40,15 +41,26 @@ export abstract class BaseBenchmarkHelper {
     };
   }
 
-  public async startAllDataPush() {
+  public async startAllDataPush(options?: {
+    count: number;
+    interval: number;
+    total: number;
+  }) {
 
     return await new Promise<void>((resolve) => {
+      options = options || { count: 100, interval: 10, total: 10000 };
       startWs(
-        { count: 100, interval: 10, isPushAllData: true, total: 10000 },
+        {
+          count: options.count,
+          interval: options.interval,
+          isPushAllData: true,
+          total: options.total
+        },
         (data) => {
           this.insertData(data);
         },
-        () => {
+        async () => {
+          await wait(1);
           resolve();
         }
       );

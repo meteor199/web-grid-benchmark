@@ -17,7 +17,7 @@ import {
 export abstract class CPUBenchmark implements BenchmarkImpl {
   type = BenchmarkType.CPU;
 
-  constructor(public benchmarkInfo: CPUBenchmarkInfo) {}
+  constructor(public benchmarkInfo: CPUBenchmarkInfo) { }
   abstract init(page: Page): Promise<any>;
   abstract run(page: Page): Promise<any>;
 
@@ -31,13 +31,14 @@ export abstract class CPUBenchmark implements BenchmarkImpl {
 
   public async evaluateWebHelper(
     page: Page,
-    methodName: keyof BaseBenchmarkHelper
+    methodName: keyof BaseBenchmarkHelper,
+    param?: any,
   ) {
     const result = await page.evaluate(
-      ([methodName, keyName]) => {
-        return (window as any)[keyName][methodName]();
+      ([methodName, keyName, param]) => {
+        return (window as any)[keyName][methodName](param);
       },
-      [methodName, WINDOW__BENCHMARK_HELPER]
+      [methodName, WINDOW__BENCHMARK_HELPER, param]
     );
 
     if (result?.type) {
