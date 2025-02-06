@@ -8,6 +8,7 @@ import path from 'path';
 const benchOptions: BenchmarkOptions = {
   url: ``,
   iterationNumber: 0,
+  // enableTraceLog: true,
   // disableGPU: true,
   // cpuSlowdownFactor: 4,
   // keepWindowOpen: true,

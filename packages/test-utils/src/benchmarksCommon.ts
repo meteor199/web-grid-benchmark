@@ -97,5 +97,8 @@ export interface BenchmarkOptions {
    * @default false Auto-close window after test
    */
   keepWindowOpen?: boolean;
-
+  /**
+   * Whether to record performance trace logs
+   */
+  enableTraceLog?: boolean;
 }

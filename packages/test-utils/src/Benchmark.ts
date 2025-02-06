@@ -67,24 +67,27 @@ export class Benchmark {
 
       console.log('init success');
 
-      const tracePath = this.getTracePath() + '.json';
 
       const memoryStart = await getMemoryUsage(page, client);
-
-      await browser.startTracing(page, {
-        path: tracePath,
-        screenshots: false,
-        categories: [
-          'blink.user_timing',
-          'devtools.timeline',
-          'disabled-by-default-devtools.timeline',
-          'disabled-by-default-v8.cpu_profiler',
-          'disabled-by-default-v8.runtime_stats',
-          'v8.execute',
-          'v8',
-          'rendering',
-        ],
-      });
+      
+      // Only record trace logs if enabled in options
+      if (this.benchOptions.enableTraceLog) {
+        const tracePath = this.getTracePath() + '.json';
+        await browser.startTracing(page, {
+          path: tracePath,
+          screenshots: false,
+          categories: [
+            'blink.user_timing',
+            'devtools.timeline',
+            'disabled-by-default-devtools.timeline',
+            'disabled-by-default-v8.cpu_profiler',
+            'disabled-by-default-v8.runtime_stats',
+            'v8.execute',
+            'v8',
+            'rendering',
+          ],
+        });
+      }
 
       const startMetrics = await client.send('Performance.getMetrics')
       const startTime = performance.now();
@@ -92,7 +95,9 @@ export class Benchmark {
       const duration = Math.floor(performance.now() - startTime);
       const endMetrics = await client.send('Performance.getMetrics');
 
-      await browser.stopTracing();
+      if (this.benchOptions.enableTraceLog) {
+        await browser.stopTracing();
+      }
       const memoryEnd = await getMemoryUsage(page, client);
 
       await this.saveMetics(startMetrics, endMetrics);
