@@ -33,6 +33,9 @@ export async function runBenchmark(
       `Starting ${gridData.name} benchmark ${benchOptions.iterationNumber}:`,
       task.benchmarkInfo.label
     );
+    const startTime = performance.now();
     await benchmark.run();
+    const duration = Math.floor(performance.now() - startTime);
+    console.log(`Benchmark completed in ${duration}ms`);
   }
 }
