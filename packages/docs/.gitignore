@@ -1,2 +1,3 @@
 public/result.json
 public/results_throttled.json
+.vitepress/cache

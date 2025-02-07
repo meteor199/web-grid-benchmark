@@ -4,20 +4,21 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "docs:build": "tsc && vite build",
-    "preview": "vite preview",
-    "deploy": "gh-pages -d dist"
+    "docs:dev": "vitepress dev",
+    "docs:build": "vitepress build",
+    "docs:preview": "vitepress preview",
+    "deploy": "gh-pages -d .vitepress/dist"
   },
   "dependencies": {
+    "vue": "^3.5.13",
     "@web-grid-benchmark/core": "workspace:*",
     "@web-grid-benchmark/test-utils": "workspace:*",
     "ag-grid-community": "^32.3.3",
     "ag-grid-enterprise": "~32.3.3"
   },
   "devDependencies": {
-    "gh-pages": "^6.2.0",
+    "gh-pages": "^6.3.0",
     "typescript": "^5.5.3",
-    "vite": "^5.4.2"
+    "vitepress": "^1.6.3"
   }
 }
