@@ -43,7 +43,7 @@ async function init() {
   const [, data] = await Promise.all([tableApi.render(canvas), generateGridData()]);
   gridData = data;
 
-  await Promise.all([tableApi.init(), tableApi.set_temp_data(data)]);
+  await Promise.all([tableApi.init()]);
 
   console.log('init done');
 }
@@ -64,6 +64,7 @@ export class ImGuiBenchmarkHelper extends BaseBenchmarkHelper {
   }
 
   public async renderData(): Promise<WaitForInfo | void> {
+    tableApi.set_temp_data(gridData)
     tableApi.setData();
     await wait(1);
   }

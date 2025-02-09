@@ -178,7 +178,7 @@ export class TableApi {
       console.timeEnd('fill_data');
 
       // 打印示例数据
-      this.validateEmployeeData(ptrArray, data);
+      // this.validateEmployeeData(ptrArray, data);
 
       console.log('wasm memory size (set temp data success)', this.Module.HEAPU8.buffer.byteLength / 1024 / 1024);
 

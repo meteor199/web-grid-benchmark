@@ -5,6 +5,11 @@ import './custom.css'
 export default {
   ...DefaultTheme,
   enhanceApp({ app }) {
-    app.component('BulkDataPush', defineAsyncComponent(() => import('../../components/BulkDataPush.vue')))
+    app.component('BulkDataPush',
+      defineAsyncComponent(() => import('../../components/BulkDataPush.vue')))
+
+    app.component('RenderData',
+      defineAsyncComponent(() => import('../../components/RenderData.vue')))
+
   }
 }
