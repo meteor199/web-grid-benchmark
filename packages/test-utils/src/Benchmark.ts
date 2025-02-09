@@ -2,7 +2,7 @@ import { CDPSession, chromium, Page } from 'playwright';
 import { CPUBenchmark } from './CPUBenchmark';
 import { GRID_CONFIG, wait } from '@web-grid-benchmark/core';
 import { BenchmarkOptions, GridData } from './benchmarksCommon';
-import { RESULT_FILE, TRACE_DIR, TRACE_THROTTLED_DIR } from './constants';
+import { TRACE_DIR, TRACE_THROTTLED_DIR } from './constants';
 import {
   getMemoryUsage,
   appendResult,
@@ -103,10 +103,11 @@ export class Benchmark {
 
       await this.saveMetics(startMetrics, endMetrics);
 
-      appendResult({
+      appendResult(
+        this.task.benchmarkInfo.fileName|| this.task.benchmarkInfo.id,
+        {
         name: this.gridData.name,
         benchId: this.task.benchmarkInfo.id,
-        fileName: this.task.benchmarkInfo.fileName,
         iterationNumber: this.benchOptions.iterationNumber,
         duration,
         memoryStart,

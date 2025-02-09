@@ -1,8 +1,9 @@
 import { CDPSession, chromium, Page, } from 'playwright';
 import { GRID_CONFIG, wait } from '@web-grid-benchmark/core';
 
-import { RESULT_FILE, TRACE_DIR } from './constants';
+import { RESULT_DOCS_DIR, RESULT_DIR } from './constants';
 import fs from 'fs/promises';
+import path from 'path';
 
 export async function forceGC(page: Page) {
   await page.evaluate(
@@ -11,20 +12,52 @@ export async function forceGC(page: Page) {
 }
 
 
-export async function appendResult(result: Object) {
+export async function appendResult(fileName: string, result: Object) {
   try {
-    await fs.access(RESULT_FILE).catch(async () => {
-      await fs.writeFile(RESULT_FILE, '', 'utf8');
-      console.log('Result file created:', RESULT_FILE);
+    const resultFile = path.join(RESULT_DIR, `${fileName}.jsonl`);
+
+    await fs.access(resultFile).catch(async () => {
+      await fs.writeFile(resultFile, '', 'utf8');
+      console.log('Result file created:', resultFile);
     });
 
     const resultString = JSON.stringify(result) + '\n';
-
-    await fs.appendFile(RESULT_FILE, resultString, 'utf8');
-
-    console.log('Result appended to file,', resultString);
+    await fs.appendFile(resultFile, resultString, 'utf8');
+    console.log('Result appended to file:', resultFile);
   } catch (err) {
     console.error('Error appending result to file:', err);
+  }
+}
+
+async function convertJsonlToJson(originFilePath: string, targetFilePath: string) {
+  try {
+    const data = await fs.readFile(originFilePath, 'utf8');
+    if (!data.trim()) {
+      console.error('Input file is empty.');
+      return;
+    }
+
+    const jsonContent = `[${data.trim().replace(/\n/g, ',')}]`;
+
+    await fs.writeFile(targetFilePath, jsonContent, 'utf8');
+    console.log(`Converted JSONL to JSON and saved to ${targetFilePath}`);
+  } catch (error) {
+    console.error('Error during conversion:', error);
+  }
+}
+
+export async function moveResultsToDocsFile() {
+  try {
+    const tempDir = RESULT_DIR;
+    const files = await fs.readdir(tempDir);
+
+    for (const file of files) {
+      const sourcePath = path.join(tempDir, file);
+      const targetPath = path.join(RESULT_DOCS_DIR, file.replace('.jsonl', '.json'));
+      await convertJsonlToJson(sourcePath, targetPath);
+    }
+  } catch (err) {
+    console.error('Error moving results to docs file:', err);
   }
 }
 
@@ -33,10 +66,10 @@ export async function getMemoryUsage(page: Page, client: CDPSession) {
   await wait(40);
   let result = (await client.send('Performance.getMetrics'))
     .metrics.find((m) => m.name === 'JSHeapUsedSize')!.value / 1024 / 1024;
-  
+
   // let result = ((await page.evaluate("performance.measureUserAgentSpecificMemory()")) as any)
   //   .bytes / 1024 / 1024;
-  
+
   return Number(result.toFixed(2));
 }
 

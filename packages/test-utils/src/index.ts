@@ -1,6 +1,7 @@
 import { runBenchmark } from './benchmarkRunner';
 import { BenchmarkOptions } from './benchmarksCommon';
-import { GRID_DIST_DIR, RESULT_DOCS_FILE, RESULT_DOCS_FILE_THROTTLED, RESULT_FILE } from './constants';
+import { moveResultsToDocsFile } from './benchUtils';
+import { GRID_DIST_DIR, RESULT_DIR } from './constants';
 import { startServer, stopServer } from './httpServer';
 import fs from 'fs/promises';
 import path from 'path';
@@ -57,29 +58,26 @@ async function getSubdirectories(directory: string) {
   }
 }
 
-async function convertJsonlToJson() {
+async function initResultDir() {
   try {
-    const data = await fs.readFile(RESULT_FILE, 'utf8');
-    if (!data.trim()) {
-      console.error('Input file is empty.');
-      return;
-    }
-
-    const jsonContent = `[${data.trim().replace(/\n/g, ',')}]`;
-    const jsonFilePath = benchOptions.disableGPU
-      ? RESULT_DOCS_FILE_THROTTLED
-      : RESULT_DOCS_FILE;
-    await fs.writeFile(jsonFilePath, jsonContent, 'utf8');
-    console.log(`Converted JSONL to JSON and saved to ${jsonFilePath}`);
-  } catch (error) {
-    console.error('Error during conversion:', error);
+    await fs.mkdir(RESULT_DIR, { recursive: true });
+    console.log('Result directory initialized:', RESULT_DIR);
+  } catch (err) {
+    console.error('Error initializing result directory:', err);
+    throw err;
   }
 }
 
 (async () => {
-  const port = 6173;
-  await startServer(port);
-  await runAllBenchmarks(port);
-  await stopServer();
-  await convertJsonlToJson();
+  try {
+    await initResultDir();
+    const port = 6173;
+    await startServer(port);
+    await runAllBenchmarks(port);
+    await stopServer();
+    await moveResultsToDocsFile();
+  } catch (err) {
+    console.error('Error in main:', err);
+    process.exit(1);
+  }
 })();

@@ -27,23 +27,16 @@ function generateFileNameByDate() {
   return timestamp;
 }
 
-export const RESULT_FILE = path.resolve(
+
+export const RESULT_DIR = path.resolve(
   DIST_DIR,
-  `result${generateFileNameByDate()}.jsonl`
+  `results-${generateFileNameByDate()}`
 );
 
-export const RESULT_DOCS_FILE = path.resolve(
+export const RESULT_DOCS_DIR = path.resolve(
   WORKSPACE_DIR,
   'packages',
   'docs',
   'public',
-  'result.json'
-);
-
-export const RESULT_DOCS_FILE_THROTTLED = path.resolve(
-  WORKSPACE_DIR,
-  'packages',
-  'docs',
-  'public',
-  'results_throttled.json'
+  'results'
 );

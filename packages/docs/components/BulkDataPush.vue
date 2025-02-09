@@ -23,7 +23,7 @@ const chartRefs = ref({})
 
 onMounted(async () => {
   try {
-    const response = await fetch('./result.json')
+    const response = await fetch(import.meta.env.BASE_URL + 'results/06_bulk_data_push.json?' + Date.now())
     const rawData = await response.json()
 
     // Transform data to group by benchId
