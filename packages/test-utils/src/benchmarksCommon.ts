@@ -26,6 +26,7 @@ export interface BenchmarkResult {
   result: any;
 }
 export interface CPUBenchmarkInfo extends BenchmarkInfoBase {
+  fileName?: string;
   allowBatching?: boolean;
   type?: BenchmarkType.CPU;
   layoutEventRequired?: boolean;
@@ -39,7 +40,7 @@ export enum Benchmark {
   _03 = '03_sort',
   _04 = '04_filter',
   _05 = '05_push',
-  _06 = '06_all_data_push',
+  _06 = '06_bulk_data_push',
 
 }
 

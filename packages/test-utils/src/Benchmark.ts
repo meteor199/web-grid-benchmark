@@ -106,6 +106,7 @@ export class Benchmark {
       appendResult({
         name: this.gridData.name,
         benchId: this.task.benchmarkInfo.id,
+        fileName: this.task.benchmarkInfo.fileName,
         iterationNumber: this.benchOptions.iterationNumber,
         duration,
         memoryStart,

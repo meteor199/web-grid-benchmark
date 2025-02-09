@@ -107,7 +107,7 @@ class TestcaseComponent extends HTMLElement {
 
     this.shadowRoot
       ?.querySelector('#helper_start_all_data_push')
-      ?.addEventListener('click', () => this.getHelper()!.startAllDataPush());
+      ?.addEventListener('click', () => this.getHelper()!.startBulkDataPush());
   }
 }
 

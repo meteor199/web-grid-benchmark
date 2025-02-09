@@ -47,7 +47,7 @@ export abstract class BaseBenchmarkHelper {
     };
   }
 
-  public async startAllDataPush(options?: {
+  public async startBulkDataPush(options?: {
     count: number;
     interval: number;
     total: number;
