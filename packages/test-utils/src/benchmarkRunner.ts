@@ -14,8 +14,8 @@ export async function runBenchmark(
   // Launch the browser
 
   const tasks = [
-    new BenchRenderData(),
-    // new BenchScroll(),
+    // new BenchRenderData(),
+    new BenchScroll(),
     // new BenchSort(),
     // new BenchFilter(),
     // new BenchPush(),
