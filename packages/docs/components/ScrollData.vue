@@ -1,9 +1,12 @@
 <template>
   <div>
-    <div class="ag-theme-quartz" id="renderDataGrid" style="height: 200px; width: 100%;"></div>
+    <div class="ag-theme-quartz" id="scrollDataGrid" style="height: 200px; width: 100%;"></div>
     <div class="charts-container">
       <div class="chart-item">
-        <div ref="chartRef" style="width: 100%; height: 400px;"></div>
+        <div ref="timeChartRef" style="width: 100%; height: 400px;"></div>
+      </div>
+      <div class="chart-item">
+        <div ref="fpsChartRef" style="width: 100%; height: 400px;"></div>
       </div>
     </div>
   </div>
@@ -17,7 +20,8 @@ import { createGrid } from 'ag-grid-community'
 import * as echarts from 'echarts'
 
 const gridData = ref([])
-const chartRef = ref(null)
+const timeChartRef = ref(null)
+const fpsChartRef = ref(null)
 
 onMounted(async () => {
   try {
@@ -27,9 +31,9 @@ onMounted(async () => {
     // Transform data for grid
     gridData.value = rawData.map(item => ({
       name: item.name,
-      cpuTime: Number(item.totalCPUTime).toFixed(2),
-      duration: Number(item.duration).toFixed(2),
-      fps: Number(item.fps).toFixed()
+      cpuTime: Number(Number(item.totalCPUTime).toFixed(2)),
+      duration: Number(Number(item.duration).toFixed(2)),
+      fps: Number(Number(item.fps).toFixed())
     }))
 
     const columnDefs = [
@@ -69,85 +73,95 @@ onMounted(async () => {
       animateRows: true
     }
 
-    const gridDiv = document.querySelector('#renderDataGrid')
+    await nextTick()
+    const gridDiv = document.querySelector('#scrollDataGrid')
     if (gridDiv) {
       const grid = createGrid(gridDiv, gridOptions)
       grid.setGridOption('rowData', gridData.value)
     }
 
     // Initialize Echarts
-    await nextTick()
-    if (chartRef.value) {
-      const myChart = echarts.init(chartRef.value)
-      const gridNames = gridData.value.map(item => item.name)
-      
-      const option = {
-        tooltip: {
-          trigger: 'axis',
-          axisPointer: {
-            type: 'shadow'
-          }
-        },
-        legend: {
-          data: ['CPU耗时', '总耗时', '帧率']
-        },
-        grid: {
-          right: '20%'
-        },
-        xAxis: {
-          type: 'category',
-          data: gridNames,
-          axisLabel: {
-            interval: 0,
-            rotate: 30
-          }
-        },
-        yAxis: [
-          {
-            type: 'value',
-            name: '耗时(ms)',
-            position: 'left'
-          },
-          {
-            type: 'value',
-            name: 'FPS',
-            position: 'right',
-            min: 0,
-            max: 60,
-            interval: 10,
-            axisLine: {
-              show: true
-            },
-            splitLine: {
-              show: false
-            }
-          }
-        ],
-        series: [
-          {
-            name: 'CPU耗时',
-            type: 'bar',
-            data: gridData.value.map(item => Number(item.cpuTime))
-          },
-          {
-            name: '总耗时',
-            type: 'bar',
-            data: gridData.value.map(item => Number(item.duration))
-          },
-          {
-            name: '帧率',
-            type: 'bar',
-            yAxisIndex: 1,
-            itemStyle: {
-              opacity: 0.5
-            },
-            data: gridData.value.map(item => Number(item.fps))
-          }
-        ]
-      }
+    const timeChart = echarts.init(timeChartRef.value)
+    const fpsChart = echarts.init(fpsChartRef.value)
+    const gridNames = gridData.value.map(item => item.name)
 
-      myChart.setOption(option)
+    // Time metrics chart
+    const timeOption = {
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+          type: 'shadow'
+        }
+      },
+      legend: {
+        data: gridNames,
+        type: 'scroll'
+      },
+      grid: {
+        right: '5%'
+      },
+      xAxis: {
+        type: 'category',
+        data: ['CPU耗时', '总耗时'],
+        axisLabel: {
+          interval: 0
+        }
+      },
+      yAxis: {
+        type: 'value',
+        name: '耗时(ms)',
+      },
+      series: gridNames.map(name => {
+        const item = gridData.value.find(d => d.name === name)
+        return {
+          name: name,
+          type: 'bar',
+          data: [item.cpuTime, item.duration]
+        }
+      })
     }
+
+    // FPS chart
+    const fpsOption = {
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+          type: 'shadow'
+        }
+      },
+      legend: {
+        data: gridNames,
+        type: 'scroll'
+      },
+      grid: {
+        right: '5%'
+      },
+      xAxis: {
+        type: 'category',
+        data: ['帧率'],
+        axisLabel: {
+          interval: 0
+        }
+      },
+      yAxis: {
+        type: 'value',
+        name: 'FPS',
+        min: 0,
+        max: 60,
+        interval: 10
+      },
+      series: gridNames.map(name => {
+        const item = gridData.value.find(d => d.name === name)
+        return {
+          name: name,
+          type: 'bar',
+          data: [item.fps]
+        }
+      })
+    }
+
+    timeChart.setOption(timeOption)
+    fpsChart.setOption(fpsOption)
   } catch (error) {
     console.error('Error loading or processing data:', error)
   }
