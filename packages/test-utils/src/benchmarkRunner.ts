@@ -15,8 +15,8 @@ export async function runBenchmark(
 
   const tasks = [
     // new BenchRenderData(),
-    new BenchScroll(),
-    // new BenchSort(),
+    // new BenchScroll(),
+    new BenchSort(),
     // new BenchFilter(),
     // new BenchPush(),
 

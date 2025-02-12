@@ -19,5 +19,10 @@ export default {
       'ScrollData',
       defineAsyncComponent(() => import('../../components/ScrollData.vue'))
     );
+    
+    app.component(
+      'SortData',
+      defineAsyncComponent(() => import('../../components/SortData.vue'))
+    );
   },
 };
