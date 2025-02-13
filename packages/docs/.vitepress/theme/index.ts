@@ -24,5 +24,11 @@ export default {
       'SortData',
       defineAsyncComponent(() => import('../../components/SortData.vue'))
     );
+
+    
+    app.component(
+      'FilterData',
+      defineAsyncComponent(() => import('../../components/FilterData.vue'))
+    );
   },
 };

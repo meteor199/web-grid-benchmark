@@ -16,8 +16,8 @@ export async function runBenchmark(
   const tasks = [
     // new BenchRenderData(),
     // new BenchScroll(),
-    new BenchSort(),
-    // new BenchFilter(),
+    // new BenchSort(),
+    new BenchFilter(),
     // new BenchPush(),
 
     // 总1万条数据，每100ms推送5条数据
