@@ -1,0 +1,1 @@
+import{_ as a,c as i,ag as l,o as r}from"./chunks/framework.DHS89c-t.js";const b=JSON.parse('{"title":"Web Grid 性能基准测试","description":"","frontmatter":{},"headers":[],"relativePath":"index.md","filePath":"index.md"}'),t={name:"index.md"};function n(h,e,o,d,s,c){return r(),i("div",null,e[0]||(e[0]=[l("",6)]))}const _=a(t,[["render",n]]);export{b as __pageData,_ as default};
