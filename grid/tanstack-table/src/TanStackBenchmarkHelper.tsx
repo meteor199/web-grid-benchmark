@@ -42,7 +42,12 @@ export class TanStackBenchmarkHelper extends BaseBenchmarkHelper {
     }
 
     async filter(): Promise<void> {
-        await wait(100);
+        const filteredData = gridData.filter(row => row.department.includes('Engineering'));
+        root.render(
+            <React.StrictMode>
+                <DataTable data={[...filteredData]} />
+            </React.StrictMode>
+        );
     }
 
     async startWebsocket(): Promise<void> {
